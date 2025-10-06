@@ -50,6 +50,18 @@ void add_fila(Fila* f, PCB* p) {
     }
 }
 
+PCB* remover_inicio(Fila* f) {
+
+    if (f->inicio == NULL) return NULL;
+    PCB* p = f->inicio;
+    f->inicio = p->prox;
+    if (f->inicio != NULL)
+        f->inicio->ant = NULL;
+    else
+        f->fim = NULL;
+    return p;
+}
+
 int main () {
     new_escalonador();
     unsigned int pprid = 0;
