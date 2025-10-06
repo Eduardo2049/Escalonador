@@ -65,25 +65,51 @@ PCB* remover_inicio(Fila* f) {
 int main () {
     new_escalonador();
     unsigned int pprid = 0;
-    for (int i=0; i < 1000000; i++){
+
+    while(ciclo < 1000) {
         pprid++;
-        unsigned int fx = (rand() * 1000) & 0x1f;
+        unsigned int fila_rand = rand() & 0x1f;
 
         PCB* novo = criar_novo(pprid, fila_aleatoria);
         add_fila(&escalonador[fila_aleatoria], novo);
+        i++;
     }
     
     int ciclo = 0;
 
-    while (1){
-        if (ciclo>0 && ciclo %10 == 0) {
-            for (int i = NUM_FILAS -1; i > 0; i--){
-                PCB* p = remover_inicio(&escalonador[i]);
-                if(p != NULL) {
-                    p-> fila = i-1;
-                    add_fila(&escalonador[i-1], p);
+    while (ciclo < 1000) {
+            ciclo++;
+            
+            int f = 0;
+            PCB* exec = NULL;
+            while (f < NUM_FILAS) {
+                if (escalonador[f].inicio != NULL) {
+                    exec = remover_inicio(&escalonador[f]);
+                    break;
+                }
+                f++;
+            }
+            if (exec != NULL) {
+                exec->tempo_restante--;
+                printf("Ciclo %d -> Executando PID %d (prioridade %d, restante=%d)\n",
+                    ciclo, exec->pid, exec->fila, exec->tempo_restante);
+                if (exec->tempo_restante > 0) {
+                    add_fila(&escalonador[exec->fila], exec);
+                } else {
+                    free(exec);
+                }
+            }
+            if (ciclo > 0 && ciclo % 10 == 0) {
+                int j = 1;
+                while (j < NUM_FILAS) {
+                    PCB* p = remover_inicio(&escalonador[j]);
+                    if (p != NULL) {
+                        p->fila = j - 1; 
+                        add_fila(&escalonador[j - 1], p);
+                    }
+                    j++;
                 }
             }
         }
-    }
+    return 0;
 }
